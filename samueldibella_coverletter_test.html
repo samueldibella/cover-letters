@@ -1,0 +1,361 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Love Letters reimplementation
+copyright (c) 2014 Nick Montfort <nickm@nickm.com>
+based on a 1952 program by Christopher Strachey
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Updated 10 March 2015 to correct the word lists. Sources are photographs
+of Christoper Stachey's notes in the Bodleian Library from J.R. Carpenter
+and table 14.1 in Noah Wardrip-Fruin's article "Digital Media Archaeology."
+-->
+<style type="text/css">
+/* <![CDATA[ */
+body {
+ background:#000;
+ color:#fff;
+ margin:0 0 0 18pt;
+ font-family:Palatino Linotype, serif;
+ font-size:16pt;
+ opacity: 1;
+}
+a {
+ color:#117;
+ text-decoration:none;
+}
+#main {
+ padding-top:18px;
+ width:70%;
+}
+#main div {
+ font-weight:normal;
+ padding-bottom:9px;
+}
+#info {
+ top:0;
+ right:0;
+ bottom:0;
+ position:fixed;
+ height:100%;
+ width:20%;
+ color:#000;
+ background:#fff;
+ margin-left:6px;
+ border-left:thin #000 solid;
+ border-bottom:thin #000 solid;
+ padding:9px;
+ font-size:80%
+}
+#buffer {
+	top: 0;
+	width: 100%;
+}
+#reject {
+float: left;
+bottom:15;
+ right:75;
+ height:4%;
+ min-height:30px;
+ width:10%;
+ min-width:120px;
+ color:#fff;
+ font-weight:bold;
+ line-height: 30px;
+ background:#990000;
+ border-left:thick #000 solid;
+ border-bottom:thick #000 solid;
+ border-right:thick #000 solid;
+ border-top:thick #000 solid;
+ text-align:center;
+  font-size:100%
+ padding:9px;
+ transition: opacity .25s ease-in-out;
+   -moz-transition: opacity .25s ease-in-out;
+   -webkit-transition: opacity .25s ease-in-out;
+}
+#reject:hover {
+	opacity:0.5;
+}
+
+#accept {
+float:right;
+position:relative;
+bottom:15;
+ right:0;
+ height:4%;
+  min-height: 30px;
+ width:10%;
+  min-width: 120px;
+ color:#fff;
+ font-weight:bold;
+ background:#009900;
+ border-left:thick #000 solid;
+ border-bottom:thick #000 solid;
+ border-right:thick #000 solid;
+ border-top:thick #000 solid;
+  text-align:center;
+ font-size:100%
+ padding:9px;
+ transition: opacity .25s ease-in-out;
+   -moz-transition: opacity .25s ease-in-out;
+   -webkit-transition: opacity .25s ease-in-out;
+}
+#accept:hover {
+	opacity: 0.5;
+}
+
+/* ]]> */
+</style>
+<script type="text/javascript">
+
+var accepted = false;
+var t = 0,
+first = ['Dear', 'To'],
+second = ['Hiring Manager', 'Whom It May Concern'],
+adjectives = ['industrious', 'hard-working', 'technical', 'organizational', 'editorial', 'administrative', 'recent', 'enthusiastic', 'face-to-face', 'exceptional', 'accurate', 'experienced', 'proficient', 'professional', 'self-taught', 'holistic', 'new', 'relevant', 'applicable', 'comprehensive', 'integral', 'strong'],
+nouns = ['work', 'experience', 'knowledge', 'equipment', 'skill', 'advertisement', 'data', 'job', 'resume', 'intern', 'expert', 'communication', 'meeting', 'responsibility', 'computer', 'MS Office', 'synergy', 'interview', 'strength', 'expertise', 'structure', 'culture', 'interest', 'position', 'opportunity', 'ethos', 'awareness', 'process', 'environment'],
+adverbs = ['really', 'honestly', 'skillfully', 'quickly', 'accurately', 'eagerly', 'technically', 'consistently', 'truly', 'credibly', 'fully', 'hopefully', 'directly', 'officially'],
+verbs = ['establish', 'lead', 'develop', 'assist', 'provide', 'help', 'create', 'format', 'contribute to', 'study', 'write', 'improve', 'prepare', 'interest', 'communicate', 'adapt', 'document', 'augment', 'increase', 'amplify', 'intern', 'learn', 'master', 'contact', 'excel at', 'progress', 'understand', 'progress', 'adapt', 'direct', 'know'];
+
+function rand_range(maximum) {
+    "use strict";
+    return Math.floor(Math.random() * (maximum + 1));
+}
+function choose(array) {
+    "use strict";
+    return array[rand_range(array.length - 1)];
+}
+
+function maybe(words) {
+    "use strict";
+    if (Math.random() > 0.5) {
+        return ' ' + choose(words);
+    }
+    return '';
+}
+
+function longer() {
+    "use strict";
+	
+	var path = Math.random();
+	
+	if(path < .333) {
+		return ' With my' + maybe(adjectives) + ' ' + choose(nouns) + ', I would' + maybe(adverbs) + ' ' + choose(verbs) + ' your' + maybe(adjectives) + ' ' + choose(nouns) + '.'; 
+	} else if (path < .666) {
+		return ' I have a' + maybe(adjectives) + ' ' + choose(nouns) + ' and that would' + maybe(adverbs) + ' ' + choose(verbs) + ' my' + maybe(adjectives) + ' ' + choose(nouns) + ' to '+ choose(verbs) + ' your ' + choose(nouns) + '.';	
+	} else {
+		return ' It is ' + choose(adjectives) + ' to me that I' + maybe(adverbs) + ' ' + choose(verbs) + ' a ' + choose(nouns) + '.';
+	}
+}
+
+function shorter() {
+    "use strict";
+    return ' ' + choose(adjectives) + ' ' + choose(nouns) + '.';
+}
+
+function indefArticle(string) {
+	var begin = string.CharAt(0);
+	
+	if (begin === 'a' || begin === 'e' || begin === 'i' || begin === 'o' || begin === 'u') {
+		return 'an ' + string;
+	} else {
+		return 'a ' + string;
+	}
+	
+
+}
+
+function request() {
+	"use strict";
+	var path = Math.random();
+	
+	if(path < .333) {
+		return 'I hope you will ' + choose(verbs) + ' with me ' + maybe(adverbs) + ' in your mind.';
+	} else if(path < .666) {
+		return 'Please ' + choose(verbs) + ' me in your ' + choose(nouns) + '.';
+	} else {
+		return 'Let me ' + ' ' + choose(verbs) + ' ' + choose(nouns) + ' with you.';
+	}
+
+}
+
+function letter() {
+    "use strict";
+    var i, type, path, you_are = false, text = '';
+    text = text + choose(first) + ' ' + choose(second) + ',<br /><br />';
+
+    for (i = 0; i < 5; i = i + 1) {
+        type = choose(['longer', 'shorter']);
+        if (type === 'longer') {
+
+			text = text + longer();
+			you_are = false;
+
+        } else {
+            if (you_are) {
+                text = text.slice(0, -1) + ': My' + shorter();
+                you_are = false;
+            } else {
+				path = Math.random();
+			
+				if(path < .333) {
+					text = text + ' I can be your' + shorter();
+				} else if(path < .666) {
+					text = text + ' I have ' + shorter();
+				} else {
+					text = text + maybe(adverbs) + ' I could be your' + shorter();
+				}
+				
+				you_are = true;
+            }
+        }
+    }
+	
+	text = text + '<br /><br />' + request();
+	
+    text = text + '<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yours ' + choose(adverbs) + ',<br /><br />' + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sam DiBella<br />____________________________________________________________________________________________________________________________________<br /><br />';
+    return text;
+}
+
+function ty_longer() {
+    "use strict";
+	
+	var path = Math.random();
+	
+	if(path < .333) {
+		return ' With my' + maybe(adjectives) + ' ' + choose(nouns) + ', I plan to' + maybe(adverbs) + ' ' + choose(verbs) + ' your' + maybe(adjectives) + ' ' + choose(nouns) + '.'; 
+	} else if (path < .666) {
+		return ' I have a' + maybe(adjectives) + ' ' + choose(nouns) + ' and that will' + maybe(adverbs) + ' ' + choose(verbs) + ' my' + maybe(adjectives) + ' ' + choose(nouns) + ' to '+ choose(verbs) + ' your ' + choose(nouns) + '.';	
+	} else {
+		return ' It is ' + choose(adjectives) + ' to me that I' + maybe(adverbs) + ' ' + choose(verbs) + ' a ' + choose(nouns) + '.';
+	}
+}
+
+function ty_shorter() {
+    "use strict";
+    return ' ' + choose(adjectives) + ' ' + choose(nouns) + '.';
+}
+
+function thank() {
+
+	return 'Thank you for ' + maybe(adverbs) + ' choosing to ' + choose(verbs) + ' me. I am ' + maybe(adverbs) + ' ' + choose(adjectives) + '.<br /><br />';
+}
+
+function thankyou() {
+    "use strict";
+    var i, type, path, you_are = false, text = '';
+    text = text + 'Dear' + ' ' + choose(second) + ',<br /><br />';
+	
+		text = text + thank();
+	
+	    for (i = 0; i < 3; i = i + 1) {
+        type = choose(['longer', 'shorter']);
+        if (type === 'longer') {
+
+			text = text + ty_longer();
+			you_are = false;
+
+        } else {
+            if (you_are) {
+                text = text.slice(0, -1) + ': My' + ty_shorter();
+                you_are = false;
+            } else {			
+
+				text = text + maybe(adverbs) + ' I will be your' + ty_shorter();
+				
+				you_are = true;
+            }
+        }
+    }
+	
+    text = text + '<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yours ' + choose(adverbs) + ',<br /><br />' + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sam DiBella<br />____________________________________________________________________________________________________________________________________<br /><br />';
+    return text;
+}
+
+function litany() {
+    "use strict";
+    var last, buffer = document.getElementById('buffer');
+	
+	if(!accepted) {
+		if (2 > t) {
+			t += 1;
+		} else {
+			buffer.removeChild(document.getElementById('buffer').firstChild);
+		}
+		
+		last = document.createElement('div');
+		last.innerHTML = letter();
+		buffer.appendChild(last);
+	}
+    
+}
+
+function dismiss() {
+    "use strict";
+    var last, buffer = document.getElementById('buffer');
+	
+	accepted = true;
+	
+	buffer.firstChild.style.opacity = .5;
+
+	setTimeout(function(){ buffer.removeChild(document.getElementById('buffer').firstChild) }, 6000 );
+		
+	last = document.createElement('div');
+	last.innerHTML = thankyou();
+	
+	setTimeout(function(){ buffer.appendChild(last) }, 3000 );
+	
+    
+}
+
+function produce_litany() {
+    "use strict";
+	
+	litany();
+	
+	setInterval(litany, 7000);
+	
+}
+
+</script>
+  <title>Cover Letters</title>
+</head>
+	
+<div id="main">
+	<!-- <div id="reject" onclick="accepted = false; buffer.firstChild.style.opacity = .5;">
+		REJECT
+	</div>
+	<div id="accept" onclick="dismiss()">
+		ACCEPT
+	</div> -->
+	<br/><br/>
+	
+	<div id="buffer"></div>
+</div>
+<body onload="produce_litany();">
+<div id="info">
+    <h2>Cover Letters</h2>
+    <h3>Samuel DiBella</h3>
+
+    Based on code from <br />
+    <a href="http://nickm.com">Nick Montfort's</a> interpretation of <a href="http://nickm.com/memslam/love_letters.html">Love Letters</a><br />
+</div>
+</body>
+
+</html>
